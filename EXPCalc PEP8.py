@@ -61,29 +61,34 @@ indicará si se debe hacer un cambio a media caza
 def total_bake_needed(player_lv, total_exp):
     count = 0
     while total_exp > 0:
-        total_exp -= bake_param(player_lv)[0]
         count += 1
+        total_exp -= bake_param(player_lv)[0]
     return count
 
 
 # Esto le dice al jugador si debe o no hacer grind
-if enemy_lv < player_lv:
-    print("No necesitas hacer grind para esta zona")
-elif enemy_lv == player_lv:
-    print("Es seguro entrar a esta zona")
+if player_lv < 1:
+    print("Nivel de jugador inválido")
+elif enemy_lv < 1:
+    print("Nivel de enemigo inválido")
 else:
-    if levels_needed == 1:
-        print("Necesitas subir solo 1 nivel, ¡Ya casi llegas!")
+    if enemy_lv < player_lv:
+        print("No necesitas hacer grind para esta zona")
+    elif enemy_lv == player_lv:
+        print("Es seguro entrar a esta zona")
     else:
-        print("Necesitas subir " + str(levels_needed) + " niveles")
-    print("Para subir de nivel, necesitas " +
-          str(player_exp_needed(player_lv)) + " puntos de experiencia")
-    print("En tu nivel actual, el " + str(bake_param(player_lv)[1]) + " te " +
-          "podría dar " + str(bake_param(player_lv)[0]) + " puntos de" +
-          " experiencia")
-    total_exp = total_exp_needed(levels_needed, player_lv)
-    print("Necesitas " + str(total_exp) + " puntos de experiencia para llegar"
-          + " al nivel " + str(enemy_lv))
-    total_bake = total_bake_needed(player_lv, total_exp)
-    print("Puede que debas cazar " + str(total_bake) + " Kuribakes para " +
-          "obtener la experiencia necesaria")
+        if levels_needed == 1:
+            print("Necesitas subir solo 1 nivel, ¡Ya casi llegas!")
+        else:
+            print("Necesitas subir " + str(levels_needed) + " niveles")
+        print("Para subir de nivel, necesitas " +
+                str(player_exp_needed(player_lv)) + " puntos de experiencia")
+        print("En tu nivel actual, el " + str(bake_param(player_lv)[1]) + " te " +
+                "podría dar " + str(bake_param(player_lv)[0]) + " puntos de" +
+                " experiencia")
+        total_exp = total_exp_needed(levels_needed, player_lv)
+        print("Necesitas " + str(total_exp) + " puntos de experiencia para llegar"
+                + " al nivel " + str(enemy_lv))
+        total_bake = total_bake_needed(player_lv, total_exp)
+        print("Puede que debas cazar " + str(total_bake) + " Kuribakes para " +
+                "obtener la experiencia necesaria")
