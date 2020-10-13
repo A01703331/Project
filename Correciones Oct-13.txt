@@ -1,0 +1,18 @@
+Sub-Competencia:
+	Usa una biblioteca de python extra (a las vistas en el temario) que investiga por su cuenta (avance 1)
+	Explica como funciona la biblioteca extra (avance 1)
+
+Error original: No se explicaba cómo funcionaba la biblioteca de random y su función en el código
+
+Cambio realizado: Se agregó un comentario de líneas multiples que explica la función usada, como funciona, y su rol
+
+	'''
+	De la biblioteca random, se usa la función random.randint(X,Y) que elige
+	un número entero que se encuentre entre los valores X y Y, esto hace
+	que haya una variación entre los niveles de los monstruos en los que se va a
+	hacer grind, por consecuencia hace que se cree una variación en los datos
+	calculados, ya que esto es un juego cuyos desarrolladores querían que no
+	fuera tan predecible
+	'''
+
+Líneas de código donde se ve la corrección: Línea 2 a Línea 9
