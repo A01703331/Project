@@ -1,85 +1,170 @@
-PlayerLv = int(input("Nivel del jugador "))
-EnemyLv = int(input("Nivel del primer enemigo en la zona "))
-LevelsNeeded = EnemyLv - PlayerLv
+player_lv = int(input("Nivel del jugador "))
+enemy_lv = int(input("Nivel del primer enemigo en la zona "))
+levels_needed = enemy_lv - player_lv
 
 # Random hace que haya una ligera variación en el nivel de los Kuribakes
 import random
 
-"""
-Esta función define la cantidad de experiencia necesaria para subir de
-nivel actualmente
-"""
+
+def player_exp_needed(player_lv):
+    """
+    Esta función define la cantidad de experiencia necesaria para subir de
+    nivel actualmente
+    """
+    return int(100 + 20 ** ((player_lv - 1) * 0.1))
 
 
-def PlayerExpNeeded(PlayerLv):
-    return int(100 + 20 ** ((PlayerLv - 1) * 0.1))
-
-
-"""
-Esta función define la cantidad de experiencia que los Kuribake otorgan al
-ser derrotados, y también dice con cual iniciar la caza
-"""
-
-
-def BakeParam(PlayerLv):
-    SilverBakeLv = random.randint(PlayerLv + 4, PlayerLv + 6)
-    GoldBakeLv = random.randint(PlayerLv + 9, PlayerLv + 11)
-    PlatiBakeLv = random.randint(PlayerLv + 14, PlayerLv + 16)
-    if PlayerLv <= 25:
-        return int(100 + 5 ** ((SilverBakeLv - 1) * 0.1)), "KuriBake Plateado"
-    elif PlayerLv <= 50:
-        return int(100 + 10 ** ((GoldBakeLv - 4) * 0.1)), "KuriBake Dorado"
+def bake_param(player_lv):
+    """
+    Esta función define la cantidad de experiencia que los Kuribake otorgan
+    al ser derrotados
+    """
+    silver_bake_lv = random.randint(player_lv + 4, player_lv + 6)
+    gold_bake_Lv = random.randint(player_lv + 9, player_lv + 11)
+    plati_bake_lv = random.randint(player_lv + 14, player_lv + 16)
+    bake_exp = 0
+    bake_type = ""
+    if player_lv < 25:
+        bake_exp = int(100 + 5 ** ((silver_bake_lv - 1) * 0.1))
+        bake_type = "Kuribake Plateado"
+        return (bake_exp, bake_type)
+    elif player_lv < 50:
+        bake_exp = int(100 + 10 ** ((gold_bake_Lv - 4) * 0.1))
+        bake_type = "Kuribake Dorado"
+        return (bake_exp, bake_type)
     else:
-        return int(100 + 15 ** ((PlatiBakeLv - 15) * 0.1)), "KuriBake Platino"
+        bake_exp = int(100 + 15 ** ((plati_bake_lv - 15) * 0.1))
+        bake_type = "Kuribake Platino"
+        return (bake_exp, bake_type)
 
 
-"""
-Esta función define la cantidad de experiencia total para llegar al nivel
-del monstruo de la zona nueva
-"""
+def total_exp_needed(levels_needed, player_lv):
+    """
+    Esta función define la cantidad de experiencia total para llegar al nivel
+    del monstruo de la zona nueva
+    """
+    i = 0
+    total_needed = 0
+    while i < levels_needed:
+        total_needed += player_exp_needed(player_lv)
+        player_lv += 1
+        i += 1
+    return int(total_needed)
 
 
-def TotalExpNeeded(LevelsNeeded, PlayerLv):
-    Count = 0
-    TotalNeeded = 0
-    while Count < LevelsNeeded:
-        TotalNeeded += PlayerExpNeeded(PlayerLv)
-        PlayerLv += 1
-        Count += 1
-    return int(TotalNeeded)
+def total_bake_needed(player_lv, total_exp, enemy_lv):
+    '''
+    Esta función determina la cantidad de Kuribakes de cada tipo que se deben
+    cazar, además hace cálculos extras si detecta que se requiere uno o varios
+    cambios a media caza
+    '''
+    var = 1
+    count = 0
+    count2 = 0
+    count3 = 0
+    player_lv_dummy = 0
+    levels_needed_dummy = 0
+    total_exp_dummy = 0
+    player_lv_dummy2 = 0
+    levels_needed_dummy2 = 0
+    total_exp_dummy2 = 0
+    if (enemy_lv <= 25 and player_lv < 25) or (enemy_lv <= 50 and
+        player_lv >= 25) or (enemy_lv > 50 and player_lv >= 50):
+        while total_exp > 0:
+            total_exp -= bake_param(player_lv)[0]
+            count += 1
+    elif (50 > enemy_lv > 25 and player_lv < 25) or (enemy_lv > 50 and
+            player_lv >= 25):
+        if enemy_lv > 50:
+            var = 2
+        player_lv_dummy = 25*var
+        levels_needed_dummy = enemy_lv - player_lv_dummy
+        total_exp_dummy = total_exp_needed(levels_needed_dummy, player_lv_dummy)
+        while total_exp > 0:
+            total_exp -= bake_param(player_lv)[0]
+            count += 1
+        while total_exp_dummy > 0:
+            total_exp_dummy -= bake_param(player_lv_dummy)[0]
+            count2 += 1
+    elif (enemy_lv > 50 and player_lv < 25):
+        player_lv_dummy = 25
+        levels_needed_dummy = enemy_lv - player_lv_dummy
+        total_exp_dummy = total_exp_needed(levels_needed_dummy,
+                                            player_lv_dummy)
+        player_lv_dummy2 = 50
+        levels_needed_dummy2 = enemy_lv - player_lv_dummy2
+        total_exp_dummy2 = total_exp_needed(levels_needed_dummy2,
+                                            player_lv_dummy2)
+        while total_exp > 0:
+            total_exp -= bake_param(player_lv)[0]
+            count += 1
+        while total_exp_dummy > 0:
+            total_exp_dummy -= bake_param(player_lv_dummy)[0]
+            count2 += 1
+        while total_exp_dummy2 > 0:
+            total_exp_dummy2 -= bake_param(player_lv_dummy2)[0]
+            count3 += 1
+    return (count, count2, count3)
 
-
-"""
-Esta función determina la cantidad de Kuribakes que se deben cazar, e indica
-si se debe hacer un cambio a media caza
-"""
-
-
-def TotalBakeNeeded(PlayerLv, TotalExp):
-    Count = 0
-    while TotalExp > 0:
-        Count += 1
-        TotalExp -= BakeParam(PlayerLv)[0]
-    return Count
-    
 
 # Esto le dice al jugador si debe o no hacer grind
-if EnemyLv < PlayerLv:
-    print("No necesitas hacer grind para esta zona")
-elif EnemyLv == PlayerLv:
-    print("Es seguro entrar a esta zona")
+if player_lv < 1:
+    print("Nivel de jugador inválido")
+elif enemy_lv < 1:
+    print("Nivel de enemigo inválido")
 else:
-    if LevelsNeeded == 1:
-        print("Necesitas subir solo 1 nivel, ¡Ya casi llegas!")
+    if enemy_lv < player_lv:
+        print("No necesitas hacer grind para esta zona")
+    elif enemy_lv == player_lv:
+        print("Es seguro entrar a esta zona")
     else:
-        print("Necesitas subir", LevelsNeeded, "niveles")
-    print("Para subir de nivel, necesitas", PlayerExpNeeded(PlayerLv),
-            "puntos de experiencia")
-    print("En tu nivel actual, el", BakeParam(PlayerLv)[1], "te podría dar",
-            BakeParam(PlayerLv)[0], "puntos de experiencia")
-    TotalExp = TotalExpNeeded(LevelsNeeded, PlayerLv)
-    print("Necesitas", TotalExp, "puntos de experiencia para llegar al nivel",
-            EnemyLv)
-    TotalBake = TotalBakeNeeded(PlayerLv, TotalExp)
-    print("Puede que debas cazar", TotalBake, "Kuribakes para obtener la",
-            "experiencia necesaria")
+        if levels_needed == 1:
+            print("Necesitas subir solo 1 nivel, ¡Ya casi llegas!")
+        else:
+            print("Necesitas subir " +
+                    str(levels_needed) +
+                    " niveles")
+        print("Para subir de nivel, necesitas " +
+                str(player_exp_needed(player_lv)) +
+                " puntos de experiencia")
+        print("En tu nivel actual, un " +
+                str(bake_param(player_lv)[1]) +
+                " te podría dar " +
+                str(bake_param(player_lv)[0]) +
+                " puntos de experiencia")
+        total_exp = total_exp_needed(levels_needed, player_lv)
+        print("Necesitas " +
+                str(total_exp) +
+                " puntos de experiencia para llegar al nivel " +
+                str(enemy_lv))
+        total_bake = total_bake_needed(player_lv, total_exp, enemy_lv)[0]
+        total_bake2 = total_bake_needed(player_lv, total_exp, enemy_lv)[1]
+        total_bake3 = total_bake_needed(player_lv, total_exp, enemy_lv)[2]
+        # De aqúi en adelante son todos los posibles resultados
+        if total_bake2 == 0 and total_bake3 == 0:
+            print("Puede que debas cazar " +
+                    str(total_bake) +
+                    " Kuribakes para obtener la experiencia necesaria")
+        elif total_bake2 != 0 and total_bake3 == 0:
+             print("Puede que debas cazar " +
+                    str(total_bake) +
+                    " Kuribakes para obtener la experiencia necesaria," +
+                    " pero se recomienda que cuando llegues al siguiente" +
+                    " rango, busques algún " +
+                    str(bake_param(player_lv + 25)[1]) +
+                    " para que solo debas cazar alrededor de " +
+                    str(total_bake2))
+        elif total_bake2 != 0 and total_bake3 != 0:
+            print("Puede que debas cazar " +
+                    str(total_bake) +
+                    " Kuribakes para obtener la experiencia necesaria," +
+                    " pero se recomienda que cuando llegues al siguiente" +
+                    " rango, busques algún " +
+                    str(bake_param(player_lv + 25)[1]) +
+                    " para que solo debas cazar alrededor de " +
+                    str(total_bake2) +
+                    " de esos, y finalmente, cuando llegues al último rango" +
+                    " busques algún " +
+                    str(bake_param(player_lv + 50)[1]) +
+                    " para que solo debas cazar alrededor de " +
+                    str(total_bake3))
